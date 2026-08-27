@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin.php
+Disallow: /uploads/
+Sitemap: https://www.afroglowafrica.com/Sitemap.xml
