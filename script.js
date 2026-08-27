@@ -399,3 +399,26 @@ document.getElementById('description-overlay')?.addEventListener('click', functi
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') fermerDescription();
 });
+
+// ============================================================
+// ANIMATION DE LA SECTION PRÉSENTATION AU SCROLL
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const seoIntro = document.querySelector('.seo-intro');
+    
+    if (seoIntro) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    seoIntro.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        });
+        
+        observer.observe(seoIntro);
+    }
+});
