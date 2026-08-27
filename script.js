@@ -1,116 +1,40 @@
 // ============================================================
-// DONNÉES PRODUITS (AVEC PRIX BARRÉ)
+// CHARGER LES PRODUITS DEPUIS L'API MySQL
 // ============================================================
-const produits = [
-    {
-        id: 1,
-        nom: "huiles essentielles",
-        prix: 30.00,
-        prix_barre: 36.00,
-        image: "produit1.jpg",
-        description: "Ce soin AfroGlow résout tous vos problèmes de peau. Si votre peau est sèche ou manque de confort, il l'hydrate et la nourrit en profondeur. Si vous avez un teint terne ou irrégulier, il unifie et illumine votre visage. Si vous avez des taches, des cicatrices ou des vergetures, il les atténue. Si votre peau est relâchée ou manque de fermeté, il la raffermit et améliore son élasticité. Si elle est irritée ou sensible, il apaise les rougeurs et la protège. Résultat : une peau douce, souple, éclatante et en pleine santé, quel que soit votre type de peau.",
-        categorie: "soins"
-    },
-    {
-        id: 2,
-        nom: "sérum afroGlow",
-        prix: 20.00,
-        prix_barre: 25.00,
-        image: "produit2.jpg",
-        description: "Le sérum AfroGlow résout vos problèmes de cheveux. Il stoppe la chute, lutte contre la calvitie et accélère la pousse. Il fortifie les racines, réduit la casse et épaissit vos cheveux. Il hydrate, nourrit et redonne brillance et douceur même aux cheveux secs ou abîmés. Résultat : des cheveux plus longs, plus forts et en meilleure santé, quel que soit votre type de cheveu.",
-        categorie: "soins"
-    },
-    {
-        id: 3,
-        nom: "savon noir",
-        prix: 20.00,
-        
-        image: "produit3.jpg",
-        description: "Ce savon noir AfroGlow nettoie votre peau en profondeur et enlève les impuretés. Il réduit les boutons, l'acné, atténue les taches, les cicatrices et les vergetures. Il unifie et éclaire le teint, exfolie en douceur, tout en hydratant et nourrissant la peau. Il apaise aussi les irritations. Résultat : une peau douce, lumineuse et éclatante, pour le visage et le corps, quel que soit votre type de peau.",
-        categorie: "soins"
-    },
-    {
-        id: 4,
-        nom: "kit antirides",
-        prix: 55.00,
-        prix_barre: 60.00,
-        image: "produit4.jpg",
-        description: "Ce kit anti-ride AfroGlow corrige tous les signes de l'âge et les imperfections. Il atténue les rides, unifie et illumine le teint, élimine les taches et les vergetures. Il raffermit la peau, améliore son élasticité, hydrate et nourrit en profondeur. Même les peaux sèches ou abîmées retrouvent douceur et éclat. Résultat : une peau lisse, éclatante et sans défauts, pour tous les types de peau.",
-        categorie: "soins"
-    },
-    {
-        id: 5,
-        nom: "Beurre afroglow",
-        prix: 15.00,
-        
-        image: "produit5.jpg",
-        description: "Ce beurre capillaire AfroGlow répond à tous vos besoins. Si vos cheveux sont secs ou abîmés, il les hydrate, les répare et les protège. S'ils cassent ou ont des fourches, il réduit la casse et les renforce. Si vos racines sont faibles, il les fortifie et favorise la pousse. Si vos cheveux sont fins ou manquent de volume, il les épaissit et les densifie. Si vous avez des démangeaisons, il les apaise. Résultat : des cheveux plus longs, plus forts, brillants et en pleine santé, pour tous les types de cheveux.",
-        categorie: "soins"
-    },
-    {
-        id: 6,
-        nom: "masque cheveux",
-        prix: 20.00,
-        prix_barre: 25.00,
-        image: "produit6.jpg",
-        description: "description sur commande",
-        categorie: "soins"
-    },
-    {
-        id: 7,
-        nom: "huile douche",
-        prix: 10.00,
-        prix_barre: 15.00,
-        image: "produit7.jpg",
-        description: "description sur commande",
-        categorie: "soins"
-    },
-    {
-        id: 8,
-        nom: "shampoing",
-        prix: 20.00,
-        
-        image: "produit8.jpg",
-        description: "Ce shampoing AfroGlow nettoie en douceur vos cheveux et votre cuir chevelu sans les agresser. Il stimule la pousse, renforce les racines et réduit la casse. Il hydrate, adoucit et redonne brillance et vitalité à vos cheveux. Il apaise et protège votre cuir chevelu. Résultat : des cheveux propres, forts et éclatants, naturellement.",
-        categorie: "soins"
-    },
-    {
-        id: 9,
-        nom: "huile réparatrice",
-        prix: 30.00,
-        prix_barre:35.00,
-        image: "produit9.jpg",
-        description: "description sur commande",
-        categorie: "soins"
-    },
-{
-        id: 10,
-        nom: "détartrant",
-        prix: 10.00,
-        
-        image: "produit10.jpg",
-        description: "Description sur commande",
-        categorie: "soins"
-    },
-   {
-        id: 11,
-        nom: "spray afro glow",
-        prix: 20.00,
-        prix_barre: 25.00,
-        image: "produit11.jpg",
-        description: "Ce spray AfroGlow hydrate et rafraîchit vos cheveux sans les alourdir. Il stimule la pousse, renforce les racines et réduit la casse. Il redonne brillance, douceur et souplesse à vos cheveux. Il définit vos boucles, réduit les frisottis et facilite le coiffage. Il apaise les irritations et les démangeaisons du cuir chevelu. Résultat : des cheveux forts, hydratés et éclatants, naturellement.",
-        categorie: "soins"
-    } 
-];
+let produits = [];
 
+async function chargerProduits() {
+    try {
+        const response = await fetch('api-produits.php?t=' + new Date().getTime());
+        if (!response.ok) throw new Error('API non accessible');
+        produits = await response.json();
+        afficherProduits(produits, 'grille-produits');
+
+        // Mettre à jour les filtres si un filtre est actif
+        const filtreActif = document.querySelector('.filtre-btn.actif');
+        if (filtreActif) {
+            const categorie = filtreActif.dataset.categorie;
+            if (categorie !== 'tous') {
+                const produitsFiltres = produits.filter(p => p.categorie === categorie);
+                afficherProduits(produitsFiltres, 'grille-produits');
+            }
+        }
+    } catch (error) {
+        console.error('Erreur de chargement:', error);
+        document.getElementById('grille-produits').innerHTML =
+            '<p style="color:#a59b91;text-align:center;padding:40px;">Impossible de charger les produits.</p>';
+    }
+}
+
+// ============================================================
+// CONSTANTES ET LOADER
+// ============================================================
 const NUMERO_WHATSAPP = "243903592715";
 
-// ============================================================
-// LOADER
-// ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('loader');
     setTimeout(() => loader.classList.add('hidden'), 1500);
+    chargerProduits();
 });
 
 // ============================================================
@@ -149,7 +73,7 @@ if (slides.length > 1) {
 }
 
 // ============================================================
-// AFFICHER PRODUITS AVEC BOUTON DESCRIPTION ET PRIX BARRÉ
+// AFFICHER LES PRODUITS
 // ============================================================
 function afficherProduits(produits, containerId) {
     const container = document.getElementById(containerId);
@@ -157,16 +81,25 @@ function afficherProduits(produits, containerId) {
 
     container.innerHTML = produits.map(p => {
         const message = `Bonjour%20je%20veux%20commander%20${encodeURIComponent(p.nom)}`;
+        
+        let imageSrc = p.image || '';
+        if (imageSrc && !imageSrc.startsWith('uploads/') && !imageSrc.startsWith('http')) {
+            imageSrc = 'uploads/' + imageSrc;
+        }
+        if (!imageSrc) {
+            imageSrc = 'uploads/default.jpg';
+        }
+        
         return `
             <div class="carte-produit" data-id="${p.id}">
                 <div class="carte-image">
-                    <img src="${p.image}" alt="${p.nom}" loading="lazy" />
+                    <img src="${imageSrc}" alt="${p.nom}" loading="lazy" onerror="this.src='uploads/default.jpg'" />
                 </div>
                 <div class="carte-body">
                     <div class="nom">${p.nom}</div>
                     <div class="prix">
-                        ${p.prix_barre ? `<span class="prix-barre">${p.prix_barre.toFixed(2)} $</span>` : ''}
-                        <span class="prix-actuel">${p.prix.toFixed(2)} $</span>
+                        ${p.prix_barre ? `<span class="prix-barre">${parseFloat(p.prix_barre).toFixed(2)} $</span>` : ''}
+                        <span class="prix-actuel">${parseFloat(p.prix).toFixed(2)} $</span>
                     </div>
                     <button class="btn-description" onclick="ouvrirOverlay(${p.id})">✦ Description</button>
                     <a href="https://wa.me/${NUMERO_WHATSAPP}?text=${message}" 
@@ -183,11 +116,8 @@ function afficherProduits(produits, containerId) {
     }).join('');
 }
 
-// Affichage initial
-afficherProduits(produits, 'grille-produits');
-
 // ============================================================
-// FILTRES PRODUITS
+// FILTRES
 // ============================================================
 const filtres = document.querySelectorAll('.filtre-btn');
 filtres.forEach(btn => {
@@ -201,7 +131,7 @@ filtres.forEach(btn => {
 });
 
 // ============================================================
-// RECHERCHE AVEC SCROLL DOUX
+// RECHERCHE
 // ============================================================
 const searchInput = document.getElementById('search-produit');
 const suggestions = document.getElementById('search-suggestions');
@@ -252,30 +182,13 @@ document.addEventListener('click', function(e) {
 });
 
 // ============================================================
-// CARROUSEL 3D TÉMOIGNAGES (optimisé)
+// CARROUSEL 3D TÉMOIGNAGES
 // ============================================================
 const temoignages = [
-    {
-        image: 'tem1.jpg',
-        texte: 'Je recommande afroglow à toutes mes amies'
-        
-    },
-    {
-        image: 'tem2.jpg',
-        texte: 'Mes cheveux sont plus forts, plus doux.'
-        
-    },
-    {
-        image: 'tem3.jpg',
-        texte: 'Enfin des produits qui respectent mes cheveux.'
-        
-    },
-    {
-        image: 'tem4.jpg',
-        texte: 'Mes cheveux n’ont jamais été aussi longs.'
-        
-    },
-    
+    { image: 'tem1.jpg', texte: 'Je recommande afroglow à toutes mes amies' },
+    { image: 'tem2.jpg', texte: 'Mes cheveux sont plus forts, plus doux.' },
+    { image: 'tem3.jpg', texte: 'Enfin des produits qui respectent mes cheveux.' },
+    { image: 'tem4.jpg', texte: 'Mes cheveux n\'ont jamais été aussi longs.' },
 ];
 
 const track = document.getElementById('carrousel3dTrack');
@@ -432,47 +345,29 @@ setTimeout(() => {
 }, 300);
 
 // ============================================================
-// BOUTON RETOUR (page cachée)
-// ============================================================
-const btnRetour = document.getElementById('btnRetour');
-const pageCachee = document.getElementById('boutique-cachee');
-const sections = document.querySelectorAll('.hero, .section-carte-flottante, .produits-section, .carrousel-3d-section, .section-ambassadrice, .section-arlene-equipe, .footer-luxe');
-
-document.querySelector('.nav-cta')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    sections.forEach(s => s.style.display = 'none');
-    pageCachee.style.display = 'block';
-    window.scrollTo(0, 0);
-});
-
-document.querySelector('.nav-cta-footer')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    sections.forEach(s => s.style.display = 'none');
-    pageCachee.style.display = 'block';
-    window.scrollTo(0, 0);
-});
-
-btnRetour?.addEventListener('click', function() {
-    pageCachee.style.display = 'none';
-    sections.forEach(s => s.style.display = 'block');
-    window.scrollTo(0, 0);
-});
-
-// ============================================================
-// OVERLAY DESCRIPTION (CARTE FLOTTANTE EN VERRE)
+// OVERLAY DESCRIPTION
 // ============================================================
 function ouvrirOverlay(id) {
     const produit = produits.find(p => p.id === id);
     if (!produit) return;
 
+    let imageSrc = produit.image || '';
+    if (imageSrc && !imageSrc.startsWith('uploads/') && !imageSrc.startsWith('http')) {
+        imageSrc = 'uploads/' + imageSrc;
+    }
+    if (!imageSrc) {
+        imageSrc = 'uploads/default.jpg';
+    }
+
     const overlay = document.getElementById('description-overlay');
     const content = document.getElementById('description-content');
 
     content.innerHTML = `
+        <img src="${imageSrc}" alt="${produit.nom}" style="width:100%; max-height:200px; object-fit:cover; border-radius:12px; margin-bottom:12px; border:1px solid rgba(212,175,136,0.1);" />
         <p class="desc-nom">${produit.nom}</p>
         <p class="desc-prix">
-            ${produit.prix_barre ? `<span class="prix-barre">${produit.prix_barre.toFixed(2)} $</span>` : ''}
-            <span class="prix-actuel">${produit.prix.toFixed(2)} $</span>
+            ${produit.prix_barre ? `<span class="prix-barre">${parseFloat(produit.prix_barre).toFixed(2)} $</span>` : ''}
+            <span class="prix-actuel">${parseFloat(produit.prix).toFixed(2)} $</span>
         </p>
         <p class="desc-texte">${produit.description || 'Description à venir.'}</p>
         <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Bonjour%2C%20je%20viens%20du%20site%20Afro%20Glow%20et%20je%20souhaite%20commander%20${encodeURIComponent(produit.nom)}" 
@@ -497,12 +392,10 @@ function fermerDescription() {
     }
 }
 
-// Fermer en cliquant sur le fond
 document.getElementById('description-overlay')?.addEventListener('click', function(e) {
     if (e.target === this) fermerDescription();
 });
 
-// Fermer avec la touche Échap
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') fermerDescription();
 });
